@@ -1,0 +1,206 @@
+<html>
+    <head>
+        <title>纸牌</title>
+        <script src="./js/jquery-3.5.1.js"></script>
+    </head>
+    <style>
+        body{
+            margin: 0 auto;
+            width: 1260px;
+        }
+
+        header{
+            background-color: rgb(175, 226, 226);
+        }
+
+        footer{
+            background-color: cadetblue;
+        }
+
+        #title{
+            text-align: center;
+            font-size: 35px;
+        }
+
+        #cards{
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+        }
+
+        .card{
+            position: relative;
+            margin: 5px 0;
+            height: 158px;
+            width: 105px;
+        }
+
+        .btn{
+            width: 100px;
+            height: 40px;
+            font-size: 25px;
+            background-color:rgb(132, 235, 215);
+            margin: 15px 25px 10px 50px;
+        }
+
+        .img,
+        .imgback {
+            display: block;
+            position: absolute;
+            height: 148px;
+            width: 105px;
+            backface-visibility: hidden;
+            transition: 0.1s linear;
+        }
+        
+        .img {
+            transform: rotateY(0deg);
+        }
+
+        .imgback {
+            transform: rotateY(-180deg);
+        }
+
+
+        .flip .img {
+            transform: rotateY(180deg);
+        }
+
+        .flip .imgback {
+            transform: rotateY(0deg);
+        }
+
+        .result{
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+    <script>
+        $(function(){
+
+            function creatDiv(){
+                var count=54;
+                var pagesize=9;
+                var n=0;
+                var div="";
+                for(var i=1;i<=count/pagesize;i++){
+                    div=div+"<div id='cards'"+i+"' class='cards'>"
+                    for(var j=1;j<=pagesize;j++){
+                        n++;
+                        div=div+"<div class='card' id='card"+n+"'><div class='img'><img src='imgs/"+n+".jpg'/></div><div class='imgback'><img src='imgs/0.jpg'/></div></div>";
+                    }
+                    div=div+"</div>"
+                }
+                $("#allcards").html(div);
+            }
+
+            $('#refresh').css("display",'none')
+            // function card(number){
+            //     if(number<=52){
+            //         var n=number%13;
+            //         if(n>1&&n<11){
+            //             return n;
+            //         }
+            //         switch(n){
+            //             case 11:
+            //                 return "J";
+            //             case 12:
+            //                 return "Q";
+            //             case 13:
+            //                 return "K";
+            //             case 1:
+            //                 return "A";
+            //             default:
+            //                 return "未识别";
+            //         }
+            //     }else if(number==53){
+            //         return "小王";
+            //     }else if(number==54){
+            //         return "大王";
+            //     }else{
+            //         return "未识别";
+            //     }
+            // }
+
+            function game(){
+                // alert("游戏开始")
+                if($('h2').html()!=""){
+                    return;
+                }
+                var count=54;
+                var arrs=new Array();
+                var allcards=$(".card");
+                var s=0;
+                for(var i=2;i<=count;i++){
+                    for(var j=1;j<=count;j++){
+                        //除以i的余数为0，则翻转
+                        if(j%i==0){
+                            arrs[s++]=j
+                        }
+                    }
+                }
+                // alert("s="+s);
+                (function(){
+                    var a=0;
+                    var inter;
+                    inter=setInterval(function(){
+                        $(allcards[arrs[a++]-1]).toggleClass("flip")
+                        $("h2").html("翻转次数："+(a-1)+"次")
+                        if(a-1==arrs.length){
+                            clearInterval(inter);
+                            //输出最终结果
+                            //黑红梅方
+                            var result="结果："
+                            var card=undefined
+                            for(var i=0;i<allcards.length;i++){
+                                card=allcards[i]
+                                if(!$(card).hasClass('flip')){
+                                    if(i!=0){
+                                        result+=","
+                                    }
+                                    result+=i+1;
+                                }
+                            }
+                            $(".result").text(result);
+                            // alert(result)
+                            $('#refresh').css("display",'')
+                        }
+                    },80)
+                })(allcards,arrs)
+            }
+
+            //创建纸牌元素
+            creatDiv();
+            // game();
+            $("#begin").click(function(){
+                $('#begin').css("display",'none')
+                $('#refresh').css("display",'none')
+                game();
+            })
+
+            $("#refresh").click(function(){
+                $('#begin').css("display",'')
+                $('#refresh').css("display",'none')
+                $(".result").text("");
+                $("h2").text("");
+                creatDiv();
+            })
+        })
+    </script>
+    <body>
+        <header>
+            <div id="title">纸牌游戏</div>
+        </header>
+        <main>
+            <div class="game">
+                <input class='btn' id='begin' type="button" value="开始">
+                <input class="btn" id='refresh' type="button" value="还原">
+            </div>
+            <h2></h2>
+            <div class="result"></div>
+            <div id='allcards'></div>
+        </main>
+        <footer>
+        </footer>
+    </body>
+</html>
